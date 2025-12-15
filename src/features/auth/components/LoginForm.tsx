@@ -167,7 +167,7 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                             type="text"
                             placeholder="Masukkan nama lengkap Anda"
                             {...registerForm.register('name')}
-                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${registerForm.formState.errors.name ? 'border-red-500' : 'border-gray-300'
+                            className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${registerForm.formState.errors.name ? 'border-red-500' : 'border-gray-300'
                                 }`}
                             disabled={isLoading}
                         />
@@ -187,7 +187,7 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                         type="email"
                         placeholder={isLoginMode ? 'Masukkan email Anda @pln.co.id' : 'nama.anda@pln.co.id'}
                         {...(isLoginMode ? loginForm.register('email') : registerForm.register('email'))}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${currentForm.formState.errors.email ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${currentForm.formState.errors.email ? 'border-red-500' : 'border-gray-300'
                             }`}
                         disabled={isLoading}
                     />
@@ -206,7 +206,7 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                         type="password"
                         placeholder="Masukkan password Anda"
                         {...(isLoginMode ? loginForm.register('password') : registerForm.register('password'))}
-                        className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${currentForm.formState.errors.password ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${currentForm.formState.errors.password ? 'border-red-500' : 'border-gray-300'
                             }`}
                         disabled={isLoading}
                     />
@@ -226,7 +226,7 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                             type="password"
                             placeholder="Masukkan ulang password Anda"
                             {...registerForm.register('confirmPassword')}
-                            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${registerForm.formState.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                            className={`w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${registerForm.formState.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
                                 }`}
                             disabled={isLoading}
                         />
