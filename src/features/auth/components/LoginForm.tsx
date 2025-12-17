@@ -90,7 +90,7 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                 throw new Error(result.error || 'Login failed');
             }
 
-            router.push('/');
+            router.push('/dashboard/pegawai');
             router.refresh();
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : 'Terjadi kesalahan');
