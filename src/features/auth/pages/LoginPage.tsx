@@ -28,7 +28,7 @@ export function LoginPage() {
                     {/* Header */}
                     <div className="mb-12">
                         <h1 className="text-4xl lg:text-5xl font-bold mb-4 border-b-4 border-white pb-2 inline-block">
-                            PLN Dashboard Suite
+                            PLN Dashboard
                         </h1>
                         <p className="text-blue-100 mt-6 text-lg leading-relaxed max-w-lg">
                             Akses terpusat untuk NKO 2025, Gudang, dan Jaringan. Khusus pegawai PLN.
