@@ -1,5 +1,8 @@
 // dashboard-pegawai/components/ActionCard.tsx
+'use client';
+
 import React from 'react';
+import Link from 'next/link';
 import { FileWarning, Wrench, Package, MapPin } from 'lucide-react';
 import { ActionItem } from '../types/dashboard';
 
@@ -19,11 +22,13 @@ const ActionCard: React.FC<ActionCardProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col items-center text-center">
-      {getIcon()}
-      <h4 className="font-semibold text-gray-900">{data.title}</h4>
-      <p className="text-xs text-gray-500 mt-1">{data.description}</p>
-    </div>
+    <Link href={data.href} className="flex flex-col">
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col items-center text-center h-full">
+        {getIcon()}
+        <h4 className="font-semibold text-gray-900">{data.title}</h4>
+        <p className="text-xs text-gray-500 mt-1">{data.description}</p>
+      </div>
+    </Link>
   );
 };
 

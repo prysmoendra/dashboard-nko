@@ -20,10 +20,10 @@ const statsData: StatItem[] = [
 ];
 
 const actionData: ActionItem[] = [
-  { title: 'Laporan Gangguan', description: 'Submit laporan gangguan', iconType: 'report', href: '#' },
-  { title: 'Update Maintenance', description: 'Update status maintenance', iconType: 'maintenance', href: '#' },
-  { title: 'Data Gudang', description: 'Input inventory gudang', iconType: 'warehouse', href: '#' },
-  { title: 'Log Aktivitas', description: 'Catat aktivitas lapangan', iconType: 'activity', href: '#' },
+  { title: 'Laporan Gangguan', description: 'Submit laporan gangguan', iconType: 'report', href: '/dashboard/pegawai/laporan-gangguan' },
+  { title: 'Update Maintenance', description: 'Update status maintenance', iconType: 'maintenance', href: '/dashboard/pegawai/update-maintenance' },
+  { title: 'Data Gudang', description: 'Input inventory gudang', iconType: 'warehouse', href: '/dashboard/pegawai/input-data-gudang' },
+  { title: 'Log Aktivitas', description: 'Catat aktivitas lapangan', iconType: 'activity', href: '/dashboard/pegawai/log-aktivitas' },
 ];
 
 const dashboardData: DashboardItem[] = [
