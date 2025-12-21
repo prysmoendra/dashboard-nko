@@ -152,6 +152,29 @@ export class AuthService implements AuthProvider {
             throw error instanceof Error ? error : new Error('Terjadi kesalahan saat registrasi');
         }
     }
+
+    /**
+     * Logout user and invalidate session
+     * 
+     * Clears the current Supabase session and invalidates the access token.
+     * The actual session cookie deletion happens in the API route.
+     * 
+     * @returns Promise<void>
+     * @throws Error if logout fails
+     */
+    async logout(): Promise<void> {
+        try {
+            const { error } = await supabase.auth.signOut();
+
+            if (error) {
+                console.error('Logout error:', error);
+                throw new Error('Gagal logout. Silakan coba lagi.');
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            throw error instanceof Error ? error : new Error('Terjadi kesalahan saat logout');
+        }
+    }
 }
 
 // Export singleton instance

@@ -60,7 +60,7 @@ export interface AuthResponse {
 export interface AuthProvider {
     login(credentials: LoginCredentials): Promise<AuthResponse>;
     register(credentials: RegisterCredentials): Promise<AuthResponse>;
+    logout(): Promise<void>;
     // Future methods can be added here:
-    // logout(sessionToken: string): Promise<void>;
     // refreshSession(token: string): Promise<Session>;
 }

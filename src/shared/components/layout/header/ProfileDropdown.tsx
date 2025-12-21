@@ -2,10 +2,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { User, FileText, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Menutup dropdown saat klik di luar area
   useEffect(() => {
@@ -21,10 +24,35 @@ const ProfileDropdown = () => {
     };
   }, []);
 
+  // Handle logout
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout gagal');
+      }
+
+      // Redirect to login page
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Gagal logout. Silakan coba lagi.');
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Tombol Trigger (Avatar) */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 focus:outline-none"
       >
@@ -40,7 +68,7 @@ const ProfileDropdown = () => {
       {/* Menu Dropdown */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 origin-top-right animate-in fade-in zoom-in-95 duration-100">
-          
+
           {/* Header Info User */}
           <div className="px-4 py-3 border-b border-gray-100 mb-1">
             <p className="text-sm font-bold text-gray-900">Demo</p>
@@ -49,29 +77,31 @@ const ProfileDropdown = () => {
 
           {/* List Menu */}
           <div className="px-2 space-y-1">
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <User className="w-4 h-4 text-gray-500" />
               Profil
             </a>
-            
-            <a 
-              href="#" 
+
+            <a
+              href="#"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >
               <FileText className="w-4 h-4 text-gray-500" />
               Data & Laporan
             </a>
-            
+
             <div className="border-t border-gray-100 my-1 pt-1"></div>
-            
-            <button 
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogOut className="w-4 h-4" />
-              Keluar
+              {isLoggingOut ? 'Logging out...' : 'Keluar'}
             </button>
           </div>
         </div>
