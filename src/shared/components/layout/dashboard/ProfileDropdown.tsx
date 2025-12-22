@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, FileText, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { AUTH_ROUTES } from '@/shared/routes';
 import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
 
 const ProfileDropdown = () => {

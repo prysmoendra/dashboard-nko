@@ -1,3 +1,8 @@
+/**
+ * Application route constants
+ * Centralized route management for the dashboard-nko application
+ */
+
 const PATHS = {
   HOME: "/",
   PLANS: "/plans",
@@ -48,4 +53,27 @@ const PATHS = {
   },
 };
 
+/**
+ * Auth route constants
+ * Used for authentication-related navigation
+ */
+export const AUTH_ROUTES = {
+  LOGIN: "/auth/login",
+  REGISTER: "/auth/register",
+  FORGOT_PASSWORD: "/auth/forgot-password",
+  RESET_PASSWORD: "/auth/reset-password",
+  LOGOUT: "/auth/logout",
+} as const;
+
+/**
+ * Dashboard route constants
+ */
+export const DASHBOARD_ROUTES = {
+  ROOT: "/dashboard",
+  PEGAWAI: "/dashboard/pegawai",
+  ASISTEN: "/dashboard/asisten",
+  KEPALA_BIDANG: "/dashboard/kepala-bidang",
+} as const;
+
 export default PATHS;
+
