@@ -31,13 +31,15 @@ export async function POST(request: NextRequest) {
 
         // Set httpOnly session cookie for security
         // httpOnly prevents XSS attacks by making cookie inaccessible to JavaScript
+        // Using maxAge instead of expires for better browser compatibility
+        console.log('[Login] Setting session cookie for user:', user.email);
         response.cookies.set({
             name: 'session',
             value: session.token,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            expires: session.expiresAt,
+            maxAge: 60 * 60 * 24 * 7, // 7 days in seconds
             path: '/',
         });
 
