@@ -1,14 +1,22 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, FileText, LogOut } from 'lucide-react';
+import { User, Settings, LogOut } from 'lucide-react'; // Pakai ikon Settings (Gear)
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Data User Hardcode (Agar pasti muncul "Demo", bukan "Pengguna")
+  const user = {
+    name: "Demo",
+    email: "demo@pln.co.id",
+    initial: "D"
+  };
 
   // Menutup dropdown saat klik di luar area
   useEffect(() => {
@@ -27,26 +35,9 @@ const ProfileDropdown = () => {
   // Handle logout
   const handleLogout = async () => {
     setIsLoggingOut(true);
-
-    try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Logout gagal');
-      }
-
-      // Redirect to login page
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-      alert('Gagal logout. Silakan coba lagi.');
-      setIsLoggingOut(false);
-    }
+    setTimeout(() => {
+        router.push('/login'); 
+    }, 1000);
   };
 
   return (
@@ -58,10 +49,10 @@ const ProfileDropdown = () => {
       >
         <div className="text-right hidden sm:block">
           <p className="text-sm text-gray-500">Selamat datang,</p>
-          <p className="text-sm font-semibold text-gray-900">Demo</p>
+          <p className="text-sm font-semibold text-gray-900">{user.name}</p>
         </div>
         <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold hover:bg-blue-700 transition-colors">
-          D
+          {user.initial}
         </div>
       </button>
 
@@ -71,30 +62,36 @@ const ProfileDropdown = () => {
 
           {/* Header Info User */}
           <div className="px-4 py-3 border-b border-gray-100 mb-1">
-            <p className="text-sm font-bold text-gray-900">Demo</p>
-            <p className="text-xs text-gray-500 mt-0.5">demo@pln.co.id</p>
+            <p className="text-sm font-bold text-gray-900">{user.name}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
           </div>
 
           {/* List Menu */}
           <div className="px-2 space-y-1">
-            <a
-              href="#"
+            
+            {/* 1. Profil */}
+            <Link
+              href="/dashboard/admin/profile"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
             >
               <User className="w-4 h-4 text-gray-500" />
               Profil
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            {/* 2. Super Admin (GANTI TEXT DAN ICON DI SINI) */}
+            <Link
+              href="/dashboard/admin"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
             >
-              <FileText className="w-4 h-4 text-gray-500" />
-              Data & Laporan
-            </a>
+              <Settings className="w-4 h-4 text-gray-500" /> {/* Ikon Gear */}
+              Super Admin
+            </Link>
 
             <div className="border-t border-gray-100 my-1 pt-1"></div>
 
+            {/* 3. Keluar */}
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
