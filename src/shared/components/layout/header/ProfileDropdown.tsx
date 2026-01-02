@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, FileText, LogOut } from 'lucide-react';
+// Menambahkan ikon Settings (Gear)
+import { User, Settings, LogOut } from 'lucide-react'; 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Tambahkan Link Next.js
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +12,7 @@ const ProfileDropdown = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Menutup dropdown saat klik di luar area
+  // Menutup dropdown saat klik di luar area (TIDAK DIRUBAH)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -24,7 +26,7 @@ const ProfileDropdown = () => {
     };
   }, []);
 
-  // Handle logout
+  // Handle logout (TIDAK DIRUBAH, SESUAI REQUEST)
   const handleLogout = async () => {
     setIsLoggingOut(true);
 
@@ -77,24 +79,30 @@ const ProfileDropdown = () => {
 
           {/* List Menu */}
           <div className="px-2 space-y-1">
-            <a
-              href="#"
+            
+            {/* 1. Menu Profil */}
+            <Link
+              href="/dashboard/profile"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
             >
               <User className="w-4 h-4 text-gray-500" />
               Profil
-            </a>
+            </Link>
 
-            <a
-              href="#"
+            {/* 2. Menu Super Admin (DITAMBAHKAN/DIUBAH DARI DATA & LAPORAN) */}
+            <Link
+              href="/dashboard/admin"
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
             >
-              <FileText className="w-4 h-4 text-gray-500" />
-              Data & Laporan
-            </a>
+              <Settings className="w-4 h-4 text-gray-500" />
+              Super Admin
+            </Link>
 
             <div className="border-t border-gray-100 my-1 pt-1"></div>
 
+            {/* 3. Tombol Logout */}
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
