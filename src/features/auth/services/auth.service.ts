@@ -33,10 +33,17 @@ export class AuthService implements AuthProvider {
                 throw new Error('Login gagal. Silakan coba lagi.');
             }
 
-            // Step 2: Fetch user profile from public.users table
+            // Step 2: Fetch user profile with role info
             const { data: profile, error: profileError } = await supabase
                 .from('users')
-                .select('*')
+                .select(`
+                    *,
+                    roles:role_id (
+                        id,
+                        name,
+                        display_name
+                    )
+                `)
                 .eq('id', authData.user.id)
                 .single();
 
@@ -46,12 +53,17 @@ export class AuthService implements AuthProvider {
                 throw new Error('Profil pengguna tidak ditemukan.');
             }
 
+            // Fallback to varchar role if FK is not set (for backward compatibility)
+            const userRole = profile.roles?.name || profile.role || 'pegawai';
+
             // Step 3: Map to AuthResponse format
             const user = {
                 id: authData.user.id,
                 email: authData.user.email || email,
                 name: profile.full_name || profile.name || 'User',
-                role: profile.role || 'staff',
+                role: userRole,
+                roleId: profile.role_id,
+                roleDisplayName: profile.roles?.display_name || userRole,
                 workUnit: profile.work_unit,
                 division: profile.division,
             };
@@ -81,16 +93,29 @@ export class AuthService implements AuthProvider {
      * @throws Error if registration fails
      */
     async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-        const { email, password, name, role, workUnit, division } = credentials;
+        const { email, password, name, roleName, workUnit, division } = credentials;
 
         try {
-            // Step 1: Create auth user
+            // Step 1: Validate role exists and get role_id
+            const { data: roleData, error: roleError } = await supabase
+                .from('roles')
+                .select('id, name, display_name')
+                .eq('name', roleName)
+                .single();
+
+            if (roleError || !roleData) {
+                throw new Error(`Role "${roleName}" tidak ditemukan. Hubungi administrator.`);
+            }
+
+            // Step 2: Create auth user
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         full_name: name,
+                        role_id: roleData.id,
+                        role_name: roleData.name,
                     },
                 },
             });
@@ -103,14 +128,15 @@ export class AuthService implements AuthProvider {
                 throw new Error('Registrasi gagal. Silakan coba lagi.');
             }
 
-            // Step 2: Insert profile into public.users table
+            // Step 3: Insert profile into public.users table
             const { error: profileError } = await supabase
                 .from('users')
                 .insert({
                     id: authData.user.id,
                     email: email,
                     full_name: name,
-                    role: role,
+                    role_id: roleData.id,       // ← FK to roles.id
+                    role: roleData.name,         // ← Denormalized for convenience
                     work_unit: workUnit,
                     division: division,
                     status: 'active',
@@ -119,7 +145,7 @@ export class AuthService implements AuthProvider {
             if (profileError) {
                 console.error('Profile insert error:', profileError);
 
-                // Step 3: Attempt cleanup - delete auth user
+                // Step 4: Attempt cleanup - delete auth user
                 // Note: This requires admin privileges, so it may fail
                 // In production, consider using a Supabase Edge Function or RPC
                 try {
@@ -131,12 +157,14 @@ export class AuthService implements AuthProvider {
                 throw new Error('Gagal membuat profil pengguna. Silakan coba lagi.');
             }
 
-            // Step 4: Return auth response
+            // Step 5: Return auth response
             const user = {
                 id: authData.user.id,
                 email: email,
                 name: name,
-                role: role,
+                role: roleData.name,
+                roleId: roleData.id,
+                roleDisplayName: roleData.display_name,
                 workUnit: workUnit,
                 division: division,
             };
@@ -173,6 +201,42 @@ export class AuthService implements AuthProvider {
         } catch (error) {
             console.error('Logout error:', error);
             throw error instanceof Error ? error : new Error('Terjadi kesalahan saat logout');
+        }
+    }
+
+    async updateProfile(userId: string, data: { full_name?: string }): Promise<void> {
+        try {
+            const response = await fetch('/api/auth/update-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal memperbarui profil');
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+            throw error instanceof Error ? error : new Error('Gagal memperbarui profil.');
+        }
+    }
+
+    async updatePassword(password: string): Promise<void> {
+        try {
+            const response = await fetch('/api/auth/update-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal memperbarui password');
+            }
+        } catch (error) {
+            console.error('Update password error:', error);
+            throw error instanceof Error ? error : new Error('Gagal memperbarui password.');
         }
     }
 }

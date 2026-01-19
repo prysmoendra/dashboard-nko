@@ -3,12 +3,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, FileText, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AUTH_ROUTES } from '@/shared/routes';
 import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -30,7 +32,7 @@ const ProfileDropdown = () => {
   }, []);
 
   // Handle logout
-  const handleLogout = async () => {
+  const confirmLogout = async () => {
     try {
       setIsLoggingOut(true);
 
@@ -56,12 +58,48 @@ const ProfileDropdown = () => {
       router.push(AUTH_ROUTES.LOGIN);
     } finally {
       setIsLoggingOut(false);
+      setShowLogoutModal(false);
     }
   };
 
+  // Determine Profile Path based on Role
+  const getProfilePath = (role?: string) => {
+    if (!role) return '/dashboard/profile'; // Fallback
+
+    const lowerRole = role.toLowerCase();
+
+    // 1. Handle KABID (Catch all variations)
+    // If the DB returns 'kepala_bidang', 'kepala-bidang', 'manager', or 'kabid' -> FORCE 'kabid' path
+    if (
+      lowerRole === 'kabid' ||
+      lowerRole === 'manager' ||
+      lowerRole.includes('kepala') || // Catch 'kepala_bidang'
+      lowerRole === 'kepala-bidang'
+    ) {
+      return '/dashboard/kabid/profile';
+    }
+
+    // 2. Handle ASKBID
+    if (
+      lowerRole === 'askbid' ||
+      lowerRole === 'assistant_manager' ||
+      lowerRole === 'asisten'
+    ) {
+      return '/dashboard/askbid/profile';
+    }
+
+    // 3. Handle PEGAWAI
+    if (lowerRole === 'pegawai') {
+      return '/dashboard/pegawai/profile';
+    }
+
+    // Default Fallback (Only for unknown roles)
+    return `/dashboard/${lowerRole}/profile`;
+  };
+
+  const profilePath = getProfilePath(user?.role);
   // Get user display name with fallback
   const displayName = user?.full_name || 'Pengguna';
-
   // Get first letter for avatar initial
   const avatarInitial = user?.full_name?.charAt(0).toUpperCase() || 'U';
 
@@ -110,13 +148,14 @@ const ProfileDropdown = () => {
 
           {/* List Menu */}
           <div className="px-2 space-y-1">
-            <a
-              href="#"
+            <Link
+              href={profilePath}
               className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
             >
               <User className="w-4 h-4 text-gray-500" />
               Profil
-            </a>
+            </Link>
 
             <a
               href="#"
@@ -129,13 +168,48 @@ const ProfileDropdown = () => {
             <div className="border-t border-gray-100 my-1 pt-1"></div>
 
             <button
-              onClick={handleLogout}
+              onClick={() => {
+                setIsOpen(false);
+                setShowLogoutModal(true);
+              }}
               disabled={isLoggingOut}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogOut className="w-4 h-4" />
-              {isLoggingOut ? 'Logging out...' : 'Keluar'}
+              Keluar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 scale-100 animate-in zoom-in-95 duration-200">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <LogOut className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Konfirmasi Keluar</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Apakah Anda yakin ingin keluar dari aplikasi? Anda harus login kembali untuk mengakses dashboard.
+              </p>
+            </div>
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmLogout}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-2 bg-red-600 rounded-lg text-white font-medium hover:bg-red-700 transition-colors flex justify-center items-center gap-2"
+              >
+                {isLoggingOut ? 'Keluar...' : 'Ya, Keluar'}
+              </button>
+            </div>
           </div>
         </div>
       )}

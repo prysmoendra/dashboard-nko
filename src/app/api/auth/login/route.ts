@@ -3,6 +3,24 @@ import { authService } from '@/features/auth/services/auth.service';
 import { loginSchema } from '@/features/auth/schemas/login-schema';
 
 /**
+ * Get dashboard URL based on user role
+ */
+function getRedirectUrlForRole(role: string): string {
+    const roleRedirectMap: Record<string, string> = {
+        'pegawai': '/dashboard/pegawai',
+        'asisten': '/dashboard/askbid', // Fixed: Redirect to askbid
+        'askbid': '/dashboard/askbid',  // Added alias
+        'assistant_manager': '/dashboard/askbid', // Added alias
+        'kepala-bidang': '/dashboard/kabid',
+        'kabid': '/dashboard/kabid', // Added alias
+        'manager': '/dashboard/kabid', // Added alias
+        'super-admin': '/dashboard/admin',
+    };
+
+    return roleRedirectMap[role] || '/dashboard';
+}
+
+/**
  * POST /api/auth/login
  * 
  * Thin API route that delegates authentication logic to AuthService.
@@ -26,8 +44,15 @@ export async function POST(request: NextRequest) {
         // Delegate to service layer for business logic
         const { user, session } = await authService.login(validationResult.data);
 
-        // Create response with user data
-        const response = NextResponse.json({ user }, { status: 200 });
+        // Determine redirect URL based on role
+        const redirectUrl = getRedirectUrlForRole(user.role);
+
+        // Create response with user data and redirect URL
+        const response = NextResponse.json({
+            user,
+            success: true,
+            redirectUrl
+        }, { status: 200 });
 
         // Set httpOnly session cookie for security
         // httpOnly prevents XSS attacks by making cookie inaccessible to JavaScript

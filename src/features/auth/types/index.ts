@@ -1,9 +1,9 @@
 // Auth Domain Types and Interfaces
 
 /**
- * User role types
+ * User role types - matches roles.name in database
  */
-export type UserRole = 'staff' | 'assistant_manager' | 'manager';
+export type UserRole = 'pegawai' | 'asisten' | 'kepala-bidang' | 'super-admin';
 
 /**
  * User profile information
@@ -12,7 +12,9 @@ export interface User {
     id: string;
     email: string;
     name: string;
-    role: UserRole;
+    role: string;
+    roleId?: string;
+    roleDisplayName?: string;
     workUnit?: string;
     division?: string;
 }
@@ -34,15 +36,15 @@ export interface LoginCredentials {
 }
 
 /**
- * Registration credentials input
+ * User registration credentials
  */
 export interface RegisterCredentials {
-    name: string;
     email: string;
     password: string;
-    role: UserRole;
-    workUnit: string;
-    division: string;
+    name: string;
+    roleName: 'pegawai' | 'asisten' | 'kepala-bidang' | 'super-admin';
+    workUnit?: string;
+    division?: string;
 }
 
 /**
@@ -61,6 +63,8 @@ export interface AuthProvider {
     login(credentials: LoginCredentials): Promise<AuthResponse>;
     register(credentials: RegisterCredentials): Promise<AuthResponse>;
     logout(): Promise<void>;
+    updateProfile(userId: string, data: { full_name?: string }): Promise<void>;
+    updatePassword(password: string): Promise<void>;
     // Future methods can be added here:
     // refreshSession(token: string): Promise<Session>;
 }
