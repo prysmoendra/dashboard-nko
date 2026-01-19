@@ -1,25 +1,26 @@
 'use client';
 
 import React from 'react';
-import { Settings } from 'lucide-react';
-import StatCard from '@/features/dashboard/dashboard-pegawai/components/StatCard';
-import ActionCard from '@/features/dashboard/dashboard-pegawai/components/ActionCard';
-import DashboardCard from '@/features/dashboard/dashboard-pegawai/components/DashboardCard';
+import { Settings, BarChart3, Zap, Settings as SettingsIcon, Database, BarChart2, Activity } from 'lucide-react';
+import { StatsCard } from '@/shared/components/ui/StatsCard';
+import { DashboardPreviewCard } from '@/shared/components/ui/DashboardPreviewCard';
+import ActionCard from '@/features/data-submissions/components/ActionCard';
 
 // Import types
-import { StatItem, ActionItem, DashboardItem } from '@/features/dashboard/dashboard-pegawai/types/dashboard';
+import { ActionItem, DashboardItem } from '@/features/data-submissions/types/dashboard';
 
-// Data (same as before)
-const statsData: StatItem[] = [
-    { label: 'Total Dashboard', value: 8, iconType: 'chart', color: 'blue' },
-    { label: 'Sistem Aktif', value: 7, iconType: 'bolt', color: 'green' },
-    { label: 'Maintenance', value: 1, iconType: 'settings', color: 'orange' },
-    { label: 'Data Points', value: '5.2M', iconType: 'database', color: 'purple' },
+// Stats data
+const statsData = [
+    { label: 'Total Dashboard', value: 8, icon: BarChart3, iconColor: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { label: 'Maintenance', value: 1, icon: SettingsIcon, iconColor: 'text-orange-600', bgColor: 'bg-orange-100' },
+    { label: 'Sistem Aktif', value: 7, icon: Zap, iconColor: 'text-green-600', bgColor: 'bg-green-100' },
+    { label: 'Data Points', value: '5.2M', icon: Database, iconColor: 'text-purple-600', bgColor: 'bg-purple-100' },
 ];
 
 const actionData: ActionItem[] = [
-    { title: 'Laporan Gangguan', description: 'Submit laporan gangguan', iconType: 'report', href: '/dashboard/pegawai/laporan-gangguan' },
+    { title: 'Input Kinerja', description: 'Catat realisasi kinerja mingguan', iconType: 'performance', href: '/dashboard/pegawai/input-kinerja' },
     { title: 'Update Maintenance', description: 'Update status maintenance', iconType: 'maintenance', href: '/dashboard/pegawai/update-maintenance' },
+    { title: 'Laporan Gangguan', description: 'Submit laporan gangguan', iconType: 'report', href: '/dashboard/pegawai/laporan-gangguan' },
     { title: 'Data Gudang', description: 'Input inventory gudang', iconType: 'warehouse', href: '/dashboard/pegawai/input-data-gudang' },
     { title: 'Log Aktivitas', description: 'Catat aktivitas lapangan', iconType: 'activity', href: '/dashboard/pegawai/log-aktivitas' },
 ];
@@ -38,7 +39,7 @@ export function PegawaiDashboardPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
             {/* Section Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Central</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Pegawai</h1>
                 <p className="text-gray-500 mb-4">Akses semua dashboard dan sistem monitoring PLN dalam satu tempat</p>
 
                 <div className="flex items-center gap-3">
@@ -51,7 +52,14 @@ export function PegawaiDashboardPage() {
             {/* 1. Summary Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {statsData.map((stat, idx) => (
-                    <StatCard key={idx} data={stat} />
+                    <StatsCard
+                        key={idx}
+                        label={stat.label}
+                        value={stat.value}
+                        icon={stat.icon}
+                        iconColor={stat.iconColor}
+                        bgColor={stat.bgColor}
+                    />
                 ))}
             </div>
 
@@ -72,7 +80,14 @@ export function PegawaiDashboardPage() {
             {/* 3. Dashboard List Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {dashboardData.map((dash, idx) => (
-                    <DashboardCard key={idx} data={dash} />
+                    <DashboardPreviewCard
+                        key={idx}
+                        title={dash.title}
+                        description={dash.description}
+                        metricCount={dash.metricCount}
+                        icon={dash.type === 'nko' ? BarChart2 : Activity}
+                        iconBg={dash.type === 'nko' ? 'bg-blue-600' : 'bg-green-500'}
+                    />
                 ))}
             </div>
         </div>

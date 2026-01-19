@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { 
-  ArrowLeft, Activity, Clock, CheckCircle, XCircle, 
-  AlertCircle, FileText, Zap 
+import {
+  ChevronLeft, Activity, Clock, CheckCircle, XCircle,
+  AlertCircle, FileText, Zap
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -12,32 +12,32 @@ export default function PegawaiLaporanPage() {
 
   // --- DATA STATISTIK (Semua 0 sesuai gambar) ---
   const stats = [
-    { 
-      label: "Total Laporan", 
-      value: 0, 
-      icon: Activity, 
-      color: "text-blue-600", 
+    {
+      label: "Total Laporan",
+      value: 0,
+      icon: Activity,
+      color: "text-blue-600",
       bgIcon: "bg-transparent" // Icon chart garis biru tanpa background
     },
-    { 
-      label: "Menunggu", 
-      value: 0, 
-      icon: Clock, 
-      color: "text-orange-500", 
+    {
+      label: "Menunggu",
+      value: 0,
+      icon: Clock,
+      color: "text-orange-500",
       bgIcon: "bg-transparent"
     },
-    { 
-      label: "Approved", 
-      value: 0, 
-      icon: CheckCircle, 
-      color: "text-green-500", 
+    {
+      label: "Approved",
+      value: 0,
+      icon: CheckCircle,
+      color: "text-green-500",
       bgIcon: "bg-transparent"
     },
-    { 
-      label: "Rejected", 
-      value: 0, 
-      icon: XCircle, 
-      color: "text-red-500", 
+    {
+      label: "Rejected",
+      value: 0,
+      icon: XCircle,
+      color: "text-red-500",
       bgIcon: "bg-transparent"
     },
   ];
@@ -53,18 +53,18 @@ export default function PegawaiLaporanPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
-      
+
       {/* --- 1. TOP NAVIGATION BAR --- */}
       <div className="flex items-center gap-4 mb-8">
-        <Link 
-          href="/dashboard/pegawai" 
-          className="flex items-center text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
+        <Link
+          href="/dashboard/pegawai"
+          className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ChevronLeft className="w-4 h-4" />
           Kembali
         </Link>
         <div className="h-6 w-px bg-gray-300"></div>
-        
+
         {/* Judul Halaman dengan Ikon Petir Biru */}
         <div className="flex items-center gap-2">
           <div className="bg-blue-600 p-1 rounded-md">
@@ -102,11 +102,10 @@ export default function PegawaiLaporanPage() {
           <button
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-              activeFilter === filter.id
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${activeFilter === filter.id
                 ? "bg-white text-gray-900 shadow-sm"
                 : "text-gray-500 hover:bg-gray-200/50 hover:text-gray-700"
-            }`}
+              }`}
           >
             {filter.label}
           </button>

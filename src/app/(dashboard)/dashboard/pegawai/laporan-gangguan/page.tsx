@@ -1,7 +1,7 @@
 'use client';
 
-import LaporanGangguan from '@/features/dashboard/dashboard-pegawai/pages/laporan-gangguan';
+import { LaporanGangguanPage } from '@/features/data-submissions/pages/LaporanGangguanPage';
 
-export default function LaporanGangguanPage() {
-  return <LaporanGangguan />;
+export default function Page() {
+  return <LaporanGangguanPage />;
 }

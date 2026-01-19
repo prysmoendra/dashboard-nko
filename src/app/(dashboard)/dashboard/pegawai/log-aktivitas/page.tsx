@@ -1,7 +1,7 @@
 'use client';
 
-import LogAktivitas from '@/features/dashboard/dashboard-pegawai/pages/log-aktivitas';
+import { LogAktivitasPage } from '@/features/data-submissions/pages/LogAktivitasPage';
 
-export default function LogAktivitasPage() {
-  return <LogAktivitas />;
+export default function Page() {
+  return <LogAktivitasPage />;
 }
