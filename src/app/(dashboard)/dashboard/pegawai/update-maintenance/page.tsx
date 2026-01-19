@@ -1,7 +1,7 @@
 'use client';
 
-import UpdateMaintenance from '@/features/dashboard/dashboard-pegawai/pages/update-maintenance';
+import { RejectedDataMaintenancePage } from '@/features/data-submissions/pages/RejectedDataMaintenancePage';
 
-export default function UpdateMaintenancePage() {
-  return <UpdateMaintenance />;
+export default function Page() {
+  return <RejectedDataMaintenancePage />;
 }

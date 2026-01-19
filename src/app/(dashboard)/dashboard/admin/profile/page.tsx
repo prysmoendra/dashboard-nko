@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { 
-  ArrowLeft, Mail, Building2, Briefcase, Shield, Calendar, 
+  ChevronLeft, Mail, Building2, Briefcase, Shield, Calendar, 
   LayoutDashboard, LogOut, User 
 } from 'lucide-react';
 import Link from 'next/link';
@@ -35,10 +35,10 @@ export default function AdminProfilePage() {
       <div className="flex items-center gap-4 mb-8">
         <Link 
           href="/dashboard/admin" 
-          className="flex items-center text-gray-500 hover:text-blue-600 transition-colors group text-sm font-medium"
+          className="flex items-center mt-4 text-gray-500 hover:text-blue-600 transition-colors group text-sm font-medium"
         >
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Kembali
+          <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+          Kembali ke Dashboard
         </Link>
         <div className="h-6 w-px bg-gray-300"></div>
         

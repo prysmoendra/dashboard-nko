@@ -22,8 +22,8 @@ export const registerSchema = z.object({
     confirmPassword: z
         .string()
         .min(1, 'Konfirmasi password harus diisi'),
-    role: z.enum(['staff', 'assistant_manager', 'manager'], {
-        message: 'Pilih salah satu jabatan',
+    roleName: z.enum(['pegawai', 'asisten', 'kepala-bidang', 'super-admin'], {
+        message: 'Pilih salah satu role',
     }),
     workUnit: z
         .string()

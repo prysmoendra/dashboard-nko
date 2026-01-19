@@ -13,9 +13,10 @@ type AuthMode = 'LOGIN' | 'REGISTER';
 
 // Dropdown data
 const ROLES = [
-    { value: 'staff', label: 'Pegawai - Staff operasional' },
-    { value: 'assistant_manager', label: 'Asisten Kepala Bidang - Supervisor & review' },
-    { value: 'manager', label: 'Kepala Bidang - Manager & approval' },
+    { value: 'pegawai', label: 'Pegawai - Staff operasional' },
+    { value: 'asisten', label: 'Asisten Kepala Bidang - Supervisor & review' },
+    { value: 'kepala-bidang', label: 'Kepala Bidang - Manager & approval' },
+    { value: 'super-admin', label: 'Super Admin - Full system access' },
 ];
 
 const WORK_UNITS = [
@@ -90,7 +91,9 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                 throw new Error(result.error || 'Login failed');
             }
 
-            router.push('/dashboard/pegawai');
+            // Use redirectUrl from response for role-based redirect
+            const redirectUrl = result.redirectUrl || '/dashboard';
+            router.push(redirectUrl);
             router.refresh();
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : 'Terjadi kesalahan');
@@ -243,13 +246,13 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                             Jabatan / Role
                         </label>
                         <Select
-                            value={registerForm.watch('role') || ''}
-                            onChange={(value) => registerForm.setValue('role', value as any)}
+                            value={registerForm.watch('roleName') || ''}
+                            onChange={(value) => registerForm.setValue('roleName', value as any)}
                         >
                             <SelectTrigger
                                 placeholder="Pilih jabatan Anda"
                                 disabled={isLoading}
-                                className={registerForm.formState.errors.role ? 'border-red-500' : ''}
+                                className={registerForm.formState.errors.roleName ? 'border-red-500' : ''}
                             />
                             <SelectContent>
                                 {ROLES.map((role) => (
@@ -259,8 +262,8 @@ export function AuthForm({ onModeChange }: AuthFormProps) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        {registerForm.formState.errors.role && (
-                            <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.role.message}</p>
+                        {registerForm.formState.errors.roleName && (
+                            <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.roleName.message}</p>
                         )}
                     </div>
                 )}

@@ -1,7 +1,7 @@
 'use client';
 
-import InputDataGudang from '@/features/dashboard/dashboard-pegawai/pages/input-data-gudang';
+import { InputDataGudangPage } from '@/features/data-submissions/pages/InputDataGudangPage';
 
-export default function InputDataGudangPage() {
-  return <InputDataGudang />;
+export default function Page() {
+  return <InputDataGudangPage />;
 }
