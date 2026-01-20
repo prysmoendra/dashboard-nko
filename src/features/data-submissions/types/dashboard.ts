@@ -10,8 +10,9 @@ export interface StatItem {
 export interface ActionItem {
     title: string;
     description: string;
-    iconType: 'report' | 'maintenance' | 'warehouse' | 'activity' | 'performance';
+    iconType: 'report' | 'maintenance' | 'warehouse' | 'activity' | 'performance' | 'monitoring';
     href: string;
+    badge?: number; // Optional notification count
 }
 
 export interface DashboardItem {
@@ -20,4 +21,27 @@ export interface DashboardItem {
     metricCount: number;
     type: 'nko' | 'ulp';
     href: string;
+}
+
+// Dashboard metric types
+export interface WeeklySubmissionStatus {
+    hasSubmitted: boolean;
+    week: number;
+}
+
+export interface MonthlyAchievement {
+    percentage: number;
+    approvedCount: number;
+    totalTargets: number;
+}
+
+export interface WeeklyTrendData {
+    week: number;
+    percentage: number;
+    label: string; // "Minggu 1", "Minggu 2", etc.
+}
+
+export interface LowestIndicator {
+    indicatorName: string;
+    achievementPercentage: number;
 }

@@ -1,64 +1,140 @@
-"use client";
+'use client';
 
-import React from 'react';
-import {
-    LayoutDashboard,
-    Zap,
-    Settings,
-    Database,
-    Inbox,
-    CheckSquare,
-    BarChart3,
-    TrendingUp
-} from 'lucide-react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import { AlertCircle, AlertTriangle, TrendingUp, CheckCircle, CheckSquare } from 'lucide-react';
 import { StatsCard } from '@/shared/components/ui/StatsCard';
-import { DashboardPreviewCard } from '@/shared/components/ui/DashboardPreviewCard';
+import ActionCard from '@/features/data-submissions/components/ActionCard';
+import { StatusDistributionChart } from '../components/StatusDistributionChart';
+import { CriticalIndicatorsChart } from '../components/CriticalIndicatorsChart';
+import { askbidDashboardService } from '../api/askbid-dashboard.service';
+import { getWeekNumber } from '@/shared/utils/date.utils';
+import type { ActionItem } from '@/features/data-submissions/types/dashboard';
 
 /**
- * AsistenDashboardPage - Main dashboard for Asisten Kepala Bidang role
- * Part of approvals feature (handles instruksi and review/approval workflows)
+ * AsistenDashboardPage - Supervisor control tower dashboard for Asisten Kepala Bidang
+ * Provides multi-unit oversight with supervisory metrics and diagnostic analytics
  */
 export function AsistenDashboardPage() {
-    const stats = [
-        { label: "Total Dashboard", value: 8, icon: LayoutDashboard, iconColor: "text-blue-600", bgColor: "bg-blue-100" },
-        { label: "Sistem Aktif", value: 7, icon: Zap, iconColor: "text-green-600", bgColor: "bg-green-100" },
-        { label: "Maintenance", value: 1, icon: Settings, iconColor: "text-orange-600", bgColor: "bg-orange-100" },
-        { label: "Data Points", value: "5.2M", icon: Database, iconColor: "text-purple-600", bgColor: "bg-purple-100" },
+    const [bidangScope] = useState<string | undefined>(undefined); // TODO: Get from user session
+    const [loading, setLoading] = useState(true);
+
+    // Current date context
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1;
+    const currentYear = today.getFullYear();
+    const currentWeek = getWeekNumber(today);
+
+    // Dashboard metrics state
+    const [pendingReviewCount, setPendingReviewCount] = useState<number>(0);
+    const [unitsWithoutSubmission, setUnitsWithoutSubmission] = useState<number>(0);
+    const [averagePerformance, setAveragePerformance] = useState<number>(0);
+    const [approvedCount, setApprovedCount] = useState<number>(0);
+    const [statusDistributionData, setStatusDistributionData] = useState<Array<{ status: string; label: string; count: number; color: string }>>([]);
+    const [criticalIndicatorsData, setCriticalIndicatorsData] = useState<Array<{ indicatorName: string; achievementPercentage: number }>>([]);
+
+    // Fetch all dashboard data
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            setLoading(true);
+            try {
+                const [
+                    pendingCount,
+                    unitsWithoutSub,
+                    avgPerformance,
+                    approvedThisMonth,
+                    statusDistribution,
+                    criticalIndicators
+                ] = await Promise.all([
+                    askbidDashboardService.getPendingReviewCount(bidangScope),
+                    askbidDashboardService.getUnitsWithoutSubmission(bidangScope, currentWeek, currentMonth, currentYear),
+                    askbidDashboardService.getAverageBidangPerformance(bidangScope, currentMonth, currentYear),
+                    askbidDashboardService.getApprovedCountThisMonth(bidangScope, currentMonth, currentYear),
+                    askbidDashboardService.getStatusDistribution(bidangScope, currentWeek, currentMonth, currentYear),
+                    askbidDashboardService.getLowestIndicatorsScopeWide(bidangScope, currentMonth, currentYear, 10)
+                ]);
+
+                setPendingReviewCount(pendingCount);
+                setUnitsWithoutSubmission(unitsWithoutSub);
+                setAveragePerformance(avgPerformance);
+                setApprovedCount(approvedThisMonth);
+                setStatusDistributionData(statusDistribution);
+                setCriticalIndicatorsData(criticalIndicators);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, [bidangScope, currentMonth, currentYear, currentWeek]);
+
+    // Stats data for Row 1
+    const statsData = [
+        {
+            label: 'Menunggu Review',
+            value: pendingReviewCount,
+            icon: AlertCircle,
+            iconColor: pendingReviewCount > 0 ? 'text-orange-600' : 'text-gray-600',
+            bgColor: pendingReviewCount > 0 ? 'bg-orange-100' : 'bg-gray-100'
+        },
+        {
+            label: 'Unit Belum Lapor',
+            value: unitsWithoutSubmission,
+            icon: AlertTriangle,
+            iconColor: 'text-yellow-600',
+            bgColor: 'bg-yellow-100'
+        },
+        {
+            label: 'Rata-rata Kinerja',
+            value: `${averagePerformance}%`,
+            icon: TrendingUp,
+            iconColor: 'text-blue-600',
+            bgColor: 'bg-blue-100'
+        },
+        {
+            label: 'Total Disetujui',
+            value: approvedCount,
+            icon: CheckCircle,
+            iconColor: 'text-green-600',
+            bgColor: 'bg-green-100'
+        }
     ];
 
-    const dashboards = [
-        { title: "NKO 2025 - UP3 Cimahi", description: "Dashboard monitoring NKO UP3 Cimahi", metricCount: 24, icon: BarChart3, iconBg: "bg-blue-600" },
-        { title: "ULP CIKO", description: "Monitoring Unit Layanan Pelanggan Ciko", metricCount: 18, icon: TrendingUp, iconBg: "bg-green-500" },
+    // Action data for Row 2
+    const actionData: ActionItem[] = [
+        {
+            title: 'Review & Approval',
+            description: 'Periksa dan setujui laporan kinerja mingguan',
+            iconType: 'warehouse',
+            href: '/dashboard/askbid/review',
+            badge: pendingReviewCount // Show pending count badge
+        },
+        {
+            title: 'Monitoring Unit',
+            description: 'Pantau status pengiriman laporan per unit',
+            iconType: 'monitoring',
+            href: '/dashboard/askbid/instruksi'
+        }
     ];
 
     return (
-        <div className="space-y-6 sm:space-y-8 pb-10">
+        <div className="max-w-7xl mx-auto px-6 py-0">
+            {/* Section Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Control Tower Supervisor</h1>
+                <p className="text-gray-500 mb-4">Monitor kinerja unit dan kelola workflow approval</p>
 
-            {/* --- Header Section --- */}
-            <div className="space-y-2">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    Dashboard Asisten Kepala Bidang
-                </h1>
-                <p className="text-sm sm:text-base text-gray-600 max-w-2xl">
-                    Akses semua dashboard dan sistem monitoring PLN dalam satu tempat
-                </p>
-
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
-                    <span className="text-xs sm:text-sm font-medium text-gray-500">Role Anda:</span>
-                    <span className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs sm:text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                        Asisten Kepala Bidang
-                    </span>
-                    <span className="hidden sm:inline text-gray-400">•</span>
-                    <span className="inline-flex items-center rounded-md bg-green-50 px-2.5 py-1 text-xs sm:text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                        Up3 Cimahi
-                    </span>
+                <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-500">Role Anda:</span>
+                    <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Asisten Kepala Bidang</span>
+                    <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Up3 Cimahi</span>
                 </div>
             </div>
 
-            {/* --- Stats Cards --- */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {stats.map((stat, idx) => (
+            {/* ROW 1: Supervisory Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {statsData.map((stat, idx) => (
                     <StatsCard
                         key={idx}
                         label={stat.label}
@@ -70,64 +146,58 @@ export function AsistenDashboardPage() {
                 ))}
             </div>
 
-            {/* --- Action Section --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                {/* Link ke Instruksi */}
-                <div className="rounded-xl border border-orange-400 bg-white p-5 sm:p-6 shadow-sm h-full flex flex-col">
-                    <div className="mb-4 flex items-center gap-2">
-                        <Inbox className="h-5 w-5 text-orange-600" />
-                        <h2 className="text-base sm:text-lg font-semibold text-gray-900">Instruksi dari Kepala Bidang</h2>
-                    </div>
-                    <p className="mb-6 text-sm text-gray-600">
-                        Lihat dan tindak lanjuti instruksi dari Kepala Bidang
-                    </p>
-
-                    <Link
-                        href="/dashboard/askbid/instruksi"
-                        className="group flex w-full flex-col items-center justify-center rounded-lg border border-gray-100 bg-gray-50 py-6 sm:py-8 hover:bg-gray-100 transition-colors active:scale-[0.99] mt-auto"
-                    >
-                        <Inbox className="mb-2 h-6 w-6 text-orange-500 group-hover:scale-110 transition-transform" />
-                        <span className="font-medium text-gray-900">Lihat Instruksi</span>
-                        <span className="text-xs text-gray-500 text-center px-4">Koordinasikan ke pegawai</span>
-                    </Link>
+            {/* ROW 2: Action Center */}
+            <div className="bg-white border rounded-2xl p-6 mb-8 shadow-sm">
+                <div className="flex items-center gap-2 mb-6">
+                    <CheckSquare className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-lg font-semibold text-gray-900">Workflow Management</h2>
                 </div>
 
-                {/* Link ke Review & Approval */}
-                <div className="rounded-xl border border-blue-400 bg-white p-5 sm:p-6 shadow-sm h-full flex flex-col">
-                    <div className="mb-4 flex items-center gap-2">
-                        <CheckSquare className="h-5 w-5 text-blue-600" />
-                        <h2 className="text-base sm:text-lg font-semibold text-gray-900">Review & Approval</h2>
-                    </div>
-                    <p className="mb-6 text-sm text-gray-600">
-                        Lihat dan tindak lanjuti instruksi dari Kepala Bidang
-                    </p>
-
-                    <Link
-                        href="/dashboard/askbid/review"
-                        className="group flex w-full flex-col items-center justify-center rounded-lg border border-gray-100 bg-gray-50 py-6 sm:py-8 hover:bg-gray-100 transition-colors active:scale-[0.99] mt-auto"
-                    >
-                        <CheckSquare className="mb-2 h-6 w-6 text-blue-500 group-hover:scale-110 transition-transform" />
-                        <span className="font-medium text-gray-900">Lihat Review & Approval</span>
-                        <span className="text-xs text-gray-500 text-center px-4">Review dan Approval Data Input</span>
-                    </Link>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {actionData.map((action, idx) => (
+                        <ActionCard key={idx} data={action} />
+                    ))}
                 </div>
             </div>
 
-            {/* --- Bottom Dashboard Links --- */}
-            <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                {dashboards.map((dashboard, idx) => (
-                    <DashboardPreviewCard
-                        key={idx}
-                        title={dashboard.title}
-                        description={dashboard.description}
-                        metricCount={dashboard.metricCount}
-                        icon={dashboard.icon}
-                        iconBg={dashboard.iconBg}
-                    />
-                ))}
-            </div>
+            {/* ROW 3: Critical Indicators & Status Distribution */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                {/* Left: Critical Indicators Chart (2/3 width) */}
+                <div className="lg:col-span-2">
+                    {loading ? (
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 h-full flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 h-full flex flex-col">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900">Area Fokus Perbaikan</h3>
+                                <p className="text-sm text-gray-500">Indikator dengan pencapaian terendah yang memerlukan perhatian</p>
+                            </div>
+                            <div className="flex-1 min-h-[400px]">
+                                {criticalIndicatorsData.length > 0 ? (
+                                    <CriticalIndicatorsChart data={criticalIndicatorsData} />
+                                ) : (
+                                    <div className="h-full flex items-center justify-center text-gray-400">
+                                        <p className="text-sm text-center">Belum ada data indikator</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
 
+                {/* Right: Status Distribution Chart (1/3 width) */}
+                <div className="lg:col-span-1">
+                    {loading ? (
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 h-full flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        </div>
+                    ) : (
+                        <StatusDistributionChart data={statusDistributionData} />
+                    )}
+                </div>
+            </div>
         </div>
     );
 }
