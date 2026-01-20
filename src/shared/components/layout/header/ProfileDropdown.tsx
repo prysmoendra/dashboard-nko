@@ -62,7 +62,12 @@ const ProfileDropdown = () => {
 
     const lowerRole = role.toLowerCase();
 
-    // 1. Handle KABID (Catch all variations)
+    // 1. Handle SUPER ADMIN
+    if (lowerRole === 'super-admin' || lowerRole === 'super_admin' || lowerRole === 'superadmin') {
+      return '/dashboard/admin/profile';
+    }
+
+    // 2. Handle KABID (Catch all variations)
     // If the DB returns 'kepala_bidang', 'kepala-bidang', 'manager', or 'kabid' -> FORCE 'kabid' path
     if (
       lowerRole === 'kabid' ||
@@ -73,7 +78,7 @@ const ProfileDropdown = () => {
       return '/dashboard/kabid/profile';
     }
 
-    // 2. Handle ASKBID
+    // 3. Handle ASKBID
     if (
       lowerRole === 'askbid' ||
       lowerRole === 'assistant_manager' ||
@@ -82,7 +87,7 @@ const ProfileDropdown = () => {
       return '/dashboard/askbid/profile';
     }
 
-    // 3. Handle PEGAWAI
+    // 4. Handle PEGAWAI
     if (lowerRole === 'pegawai') {
       return '/dashboard/pegawai/profile';
     }
