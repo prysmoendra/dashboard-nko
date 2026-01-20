@@ -58,11 +58,18 @@ export async function GET(request: NextRequest) {
 
         console.log('✅ [/api/auth/me] User authenticated, ID:', authUser.id);
 
-        // Fetch user profile from the users table
+        // Fetch user profile from the users table with role information
         console.log('📊 [/api/auth/me] Fetching user profile from database...');
         const { data: profile, error: profileError } = await supabase
             .from('users')
-            .select('id, email, full_name, role, work_unit, division')
+            .select(`
+                id, 
+                email, 
+                full_name, 
+                work_unit, 
+                division,
+                roles!inner(name)
+            `)
             .eq('id', authUser.id)
             .single();
 
@@ -84,12 +91,16 @@ export async function GET(request: NextRequest) {
 
         console.log('✅ [/api/auth/me] Profile fetched successfully for:', profile.email);
 
-        // Return user data
+        // Extract role name from the joined roles table
+        const roleName = (profile.roles as any)?.name || 'unknown';
+        console.log('🎭 [/api/auth/me] User role:', roleName);
+
+        // Return user data with role_name from the roles table
         return NextResponse.json({
             id: profile.id,
             email: profile.email,
             full_name: profile.full_name,
-            role: profile.role,
+            role: roleName, // role_name from roles table (e.g., "super-admin")
             work_unit: profile.work_unit,
             division: profile.division,
         });

@@ -3,7 +3,8 @@ export interface User {
     name: string;
     email: string;
     initial: string;
-    role: string;
+    role: string; // Display name (e.g., "Super Admin")
+    role_name: string; // Enum value (e.g., "super-admin")
     roleColor: string;
     unit: string;
     bidang: string;
