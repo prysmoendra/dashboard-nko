@@ -63,21 +63,51 @@ export class ApprovalService {
             throw new Error('Failed to fetch pending approvals');
         }
 
-        return (data || []).map(record => ({
-            id: record.id, // Weekly Realization ID
-            target_id: record.monthly_targets.id,
-            indicator_name: record.monthly_targets.indicator_name,
-            division_name: record.monthly_targets.division_name,
-            target_value: record.monthly_targets.target_value,
-            weight: record.monthly_targets.weight,
-            realization_value: record.realization_value,
-            approval_status: record.status as any,
-            submitted_at: record.submitted_at,
-            unit_name: record.monthly_targets.work_units?.name || 'Unknown Unit',
-            month: record.monthly_targets.month,
-            year: record.monthly_targets.year,
-            week: record.week // Important: Includes week
-        }));
+        type ApprovalStatus = 'pending_review' | 'approved' | 'rejected' | 'draft';
+
+        const getApprovalStatus = (status: string): ApprovalStatus => {
+            if (status == 'pending_review'){
+                return 'pending_review';
+            } else if (status == 'approved'){
+                return 'approved';
+            } else if (status == 'rejected'){
+                return 'rejected';
+            }
+            return 'draft';
+        };
+
+        return (data || []).flatMap(record => {
+            // Handle potential array/object shape from Supabase relationship selection
+            const target = (record as any).monthly_targets;
+            const monthlyTarget = Array.isArray(target) ? target[0] : target;
+
+            // If the join returned no monthly target (e.g., due to filters/RLS), skip this record
+            if (!monthlyTarget) {
+                console.warn('Skipping weekly_realizations row with missing monthly_targets join', {
+                    weekly_realization_id: record.id
+                });
+                return [];
+            }
+
+            const wuRaw = monthlyTarget.work_units;
+            const workUnit = Array.isArray(wuRaw) ? wuRaw[0] : wuRaw;
+
+            return [{
+                id: record.id, // Weekly Realization ID
+                target_id: monthlyTarget.id,
+                indicator_name: monthlyTarget.indicator_name,
+                division_name: monthlyTarget.division_name,
+                target_value: monthlyTarget.target_value,
+                weight: monthlyTarget.weight,
+                realization_value: record.realization_value,
+                approval_status: getApprovalStatus(record.status),
+                submitted_at: record.submitted_at,
+                unit_name: workUnit?.name || 'Unknown Unit',
+                month: monthlyTarget.month,
+                year: monthlyTarget.year,
+                week: record.week // Important: Includes week
+            }];
+        });
     }
 
     /**
@@ -108,7 +138,7 @@ export class ApprovalService {
         const { error: updateError } = await supabase
             .from('weekly_realizations')
             .update({
-                status: 'approved'
+                status: 'approved' // Approved
             })
             .eq('id', weeklyRealizationId);
 
@@ -140,7 +170,7 @@ export class ApprovalService {
             // Rollback: Set status back to pending_review
             await supabase
                 .from('weekly_realizations')
-                .update({ status: 'pending_review' })
+                .update({ status: 'pending_review' }) // pending_review
                 .eq('id', weeklyRealizationId);
             throw new Error('Failed to insert approved data into nko_achievements');
         }
@@ -155,7 +185,7 @@ export class ApprovalService {
         const { error } = await supabase
             .from('weekly_realizations')
             .update({
-                status: 'rejected',
+                status: 'rejected', // Rejected
                 rejection_reason: rejectionReason
             })
             .eq('id', weeklyRealizationId);
@@ -202,7 +232,7 @@ export class ApprovalService {
         const { error, count } = await supabase
             .from('weekly_realizations')
             .update({
-                status: 'rejected',
+                status: 'rejected', // Rejected
                 rejection_reason: rejectionReason
             })
             .in('id', ids);
