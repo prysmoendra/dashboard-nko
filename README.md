@@ -32,15 +32,15 @@ Tujuan dari project ini adalah:
 - CSS atau framework UI yang digunakan
 
 ## Screenshot
-### Page Login Dashboard
+## Page Login Dashboard
 <img width="1665" height="1001" alt="Screenshot 2026-09-30 at 02 04 43" src="https://github.com/user-attachments/assets/ac14bb63-9312-44fa-a698-c31b4099d942" />
-### Page Home Admin Dashboard
+## Page Home Admin Dashboard
 <img width="1665" height="1001" alt="Screenshot 2026-09-30 at 02 04 59" src="https://github.com/user-attachments/assets/792d2b65-dcf7-47e8-8dad-16b834dceb53" />
-### Page Home Kepala Bidang Dashboard
+## Page Home Kepala Bidang Dashboard
 <img width="1665" height="1001" alt="Screenshot 2026-09-30 at 02 05 15" src="https://github.com/user-attachments/assets/8a52b560-8355-4528-bd42-9c7a7cb21c0f" />
-### Page Home Asisten Kepala Bidang Dashboard
+## Page Home Asisten Kepala Bidang Dashboard
 <img width="1665" height="1001" alt="Screenshot 2026-09-30 at 02 06 08" src="https://github.com/user-attachments/assets/7810e439-7405-430b-980c-fdf46d47d126" />
-### Page Home Pegawai Dashboard
+## Page Home Pegawai Dashboard
 <img width="1665" height="1001" alt="Screenshot 2026-09-30 at 02 06 38" src="https://github.com/user-attachments/assets/fd34521b-7bc0-4e20-8dbd-e9be346ba5e6" />
 
 
