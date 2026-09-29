@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { toast } from "sonner";
 import {
     ChevronLeft, Mail, Building, Briefcase, Shield, Calendar,
     LayoutDashboard, User, LogOut
@@ -76,12 +77,12 @@ export default function SharedProfilePage({
         setIsLoading(true);
         try {
             await authService.updateProfile(user.id, { full_name: fullName });
-            alert('Profil berhasil diperbarui!');
+            toast.success('Profil berhasil diperbarui!');
             setIsEditing(false);
             window.location.reload(); // Force refresh to update Header session data
         } catch (error) {
             console.error(error);
-            alert('Gagal memperbarui profil.');
+            toast.error('Gagal memperbarui profil.');
         } finally {
             setIsLoading(false);
         }
@@ -89,28 +90,28 @@ export default function SharedProfilePage({
 
     const handleChangePassword = async () => {
         if (!passwordForm.newPassword || !passwordForm.confirmPassword) {
-            alert('Mohon isi kedua kolom password.');
+            toast.error('Mohon isi kedua kolom password.');
             return;
         }
 
         if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            alert('Konfirmasi password tidak cocok.');
+            toast.error('Konfirmasi password tidak cocok.');
             return;
         }
 
         if (passwordForm.newPassword.length < 6) {
-            alert('Password minimal 6 karakter.');
+            toast.error('Password minimal 6 karakter.');
             return;
         }
 
         setIsLoading(true);
         try {
             await authService.updatePassword(passwordForm.newPassword);
-            alert('Password berhasil diubah!');
+            toast.success('Password berhasil diubah!');
             setPasswordForm({ newPassword: '', confirmPassword: '' });
         } catch (error) {
             console.error(error);
-            alert('Gagal mengubah password.');
+            toast.error('Gagal mengubah password.');
         } finally {
             setIsLoading(false);
         }

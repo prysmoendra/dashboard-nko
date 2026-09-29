@@ -20,7 +20,7 @@ export const createUserSchema = z.object({
         .max(100, 'Password terlalu panjang'),
 
     roleName: z.enum(['pegawai', 'asisten', 'kepala-bidang', 'super-admin'], {
-        errorMap: () => ({ message: 'Pilih role yang valid' }),
+        message: 'Pilih role yang valid',
     }),
 
     workUnit: z.string()

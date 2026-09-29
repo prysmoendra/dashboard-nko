@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dashboard NKO
 
-## Getting Started
+Dashboard untuk menampilkan dan menganalisis data sebagai bagian dari project Data Science Semester 7.
 
-First, run the development server:
+## Deskripsi
+
+Project ini merupakan aplikasi dashboard berbasis web yang digunakan untuk menyajikan data dalam bentuk tabel, grafik, dan visualisasi interaktif. Dashboard ini dibuat untuk membantu pengguna memahami pola dan informasi penting dari data yang dianalisis.
+
+## Tujuan
+
+Tujuan dari project ini adalah:
+
+- Mengolah dan menyajikan data secara lebih mudah dipahami.
+- Menampilkan visualisasi data secara interaktif.
+- Membantu proses analisis dan pengambilan keputusan berdasarkan data.
+- Menerapkan konsep data science dalam aplikasi berbasis web.
+
+## Fitur
+
+- Menampilkan ringkasan data.
+- Visualisasi data dalam bentuk grafik.
+- Filter data berdasarkan kategori atau periode tertentu.
+- Tabel data yang interaktif.
+- Tampilan dashboard yang responsif.
+
+## Teknologi yang Digunakan
+
+- TypeScript
+- [React/Next.js/Vite — sesuaikan dengan project]
+- [Nama library chart — misalnya Recharts atau Chart.js]
+- [Nama database/API jika digunakan]
+- CSS atau framework UI yang digunakan
+
+## Persyaratan
+
+Pastikan sudah menginstal:
+
+- Node.js
+- npm atau package manager lainnya
+- Git
+
+## Instalasi
+
+Clone repository:
+
+```bash
+git clone https://github.com/prysmoendra/dashboard-nko.git
+cd dashboard-nko
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+## Konfigurasi Environment
+
+Jika project menggunakan environment variable, buat file `.env`:
+
+```env
+VITE_API_URL=alamat_api
+```
+
+Sesuaikan nama variable dengan konfigurasi yang digunakan di dalam project.
+
+## Menjalankan Project
+
+Untuk menjalankan project dalam mode development:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Kemudian buka alamat yang ditampilkan di terminal, biasanya:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:5173
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Build untuk Production
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Untuk menjalankan hasil build:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run preview
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Struktur Folder
 
-## Deploy on Vercel
+```text
+dashboard-nko/
+├── public/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   ├── types/
+│   └── App.tsx
+├── .env.example
+├── package.json
+└── README.md
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Sesuaikan struktur di atas dengan folder yang benar-benar ada di project.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Screenshot
+
+
+
+
+## Status Project
+
+Project ini dibuat untuk memenuhi tugas Data Science Programming Semester 7.
+
+## Lisensi
+
+Project ini dibuat untuk keperluan akademik.

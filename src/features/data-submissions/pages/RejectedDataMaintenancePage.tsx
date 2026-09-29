@@ -1,6 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import {
+        AlertDialog,
+        AlertDialogAction,
+        AlertDialogCancel,
+        AlertDialogContent,
+        AlertDialogDescription,
+        AlertDialogFooter,
+        AlertDialogHeader,
+        AlertDialogTitle,
+    } from '@/components/ui/alert-dialog';
 import Link from 'next/link';
 import { Wrench, ChevronLeft, AlertCircle, Calendar } from 'lucide-react';
 import { performanceService } from '../api/performance.service';
@@ -27,6 +38,8 @@ export function RejectedDataMaintenancePage() {
     const [loading, setLoading] = useState(false);
     const [updatedValues, setUpdatedValues] = useState<{ [key: string]: number }>({});
     const [submitting, setSubmitting] = useState<{ [key: string]: boolean }>({});
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [pendingTargetId, setPendingTargetId] = useState<string | null>(null);
 
     // Fetch rejected targets
     const fetchRejectedTargets = async () => {
@@ -45,7 +58,7 @@ export function RejectedDataMaintenancePage() {
             setUpdatedValues(initialValues);
         } catch (error) {
             console.error('Error fetching rejected targets:', error);
-            alert('Gagal memuat data yang ditolak. Silakan coba lagi.');
+            toast.error('Gagal memuat data yang ditolak. Silakan coba lagi.');
         } finally {
             setLoading(false);
         }
@@ -65,30 +78,38 @@ export function RejectedDataMaintenancePage() {
         }));
     };
 
-    // Handle resubmit
-    const handleResubmit = async (targetId: string) => {
+    // Handle resubmit - open confirmation dialog
+    const handleResubmit = (targetId: string) => {
         const newValue = updatedValues[targetId];
 
         if (newValue === null || newValue === undefined) {
-            alert('Silakan masukkan nilai realisasi terlebih dahulu');
+            toast.error('Silakan masukkan nilai realisasi terlebih dahulu');
             return;
         }
 
-        if (!confirm('Apakah Anda yakin ingin mengirim ulang data ini untuk direview?')) {
-            return;
-        }
+        setPendingTargetId(targetId);
+        setConfirmDialogOpen(true);
+    };
 
-        setSubmitting(prev => ({ ...prev, [targetId]: true }));
+    // Confirm resubmit from dialog
+    const handleConfirmResubmit = async () => {
+        if (!pendingTargetId) return;
+
+        const newValue = updatedValues[pendingTargetId];
+        setConfirmDialogOpen(false);
+        setSubmitting(prev => ({ ...prev, [pendingTargetId]: true }));
+
         try {
-            await performanceService.resubmitRejectedTarget(targetId, newValue);
-            alert('Data berhasil dikirim ulang untuk review!');
+            await performanceService.resubmitRejectedTarget(pendingTargetId, newValue);
+            toast.success('Data berhasil dikirim ulang untuk review!');
             // Refresh the list
             fetchRejectedTargets();
         } catch (error) {
             console.error('Error resubmitting:', error);
-            alert('Gagal mengirim ulang data. Silakan coba lagi.');
+            toast.error('Gagal mengirim ulang data. Silakan coba lagi.');
         } finally {
-            setSubmitting(prev => ({ ...prev, [targetId]: false }));
+            setSubmitting(prev => ({ ...prev, [pendingTargetId]: false }));
+            setPendingTargetId(null);
         }
     };
 
@@ -231,6 +252,22 @@ export function RejectedDataMaintenancePage() {
                     </div>
                 )}
             </main>
+
+            {/* Confirmation Dialog */}
+            <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Konfirmasi Pengiriman Ulang</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Apakah Anda yakin ingin mengirim ulang data ini untuk direview? Data akan ditinjau kembali oleh Askbid.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmResubmit} className="bg-red-600 hover:bg-red-700">Kirim Ulang</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
